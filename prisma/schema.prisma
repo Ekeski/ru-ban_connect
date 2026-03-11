@@ -6,12 +6,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) @map("_id")
   email     String   @unique
   password  String
   name      String?
@@ -27,7 +27,7 @@ model User {
 }
 
 model ProducerProfile {
-  id          String   @id @default(cuid())
+  id          String   @id @default(cuid()) @map("_id")
   userId      String   @unique
   businessName String?
   description String?
@@ -44,7 +44,7 @@ model ProducerProfile {
 }
 
 model Product {
-  id          String   @id @default(cuid())
+  id          String   @id @default(cuid()) @map("_id")
   name        String
   description String?
   price       Float
@@ -63,7 +63,7 @@ model Product {
 }
 
 model Order {
-  id        String      @id @default(cuid())
+  id        String      @id @default(cuid()) @map("_id")
   userId    String
   total     Float
   status    OrderStatus @default(PENDING)
@@ -78,7 +78,7 @@ model Order {
 }
 
 model OrderItem {
-  id        String @id @default(cuid())
+  id        String @id @default(cuid()) @map("_id")
   orderId   String
   productId String
   quantity  Int
