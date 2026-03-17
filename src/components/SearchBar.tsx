@@ -4,17 +4,21 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search } from 'lucide-react';
+import { Search, ShoppingCart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/context/CartContext';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
+  onCartClick?: () => void;
+  cartLabel?: string;
 }
 
-export default function SearchBar({ onSearch }: SearchBarProps) {
+export default function SearchBar({ onSearch, onCartClick }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const { itemCount } = useCart();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +61,20 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
           className="bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all duration-300 font-bold"
         >
           Search
+        </Button>
+      </motion.div>
+      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <Button
+          type="button"
+          onClick={onCartClick}
+          className="relative bg-white text-green-700 border-2 border-green-200 hover:border-green-500 hover:bg-green-50 font-bold">
+          <ShoppingCart className="h-4 w-4 mr-2" />
+          Cart
+          {itemCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs font-bold px-2 py-[2px]">
+              {itemCount}
+            </span>
+          )}
         </Button>
       </motion.div>
     </motion.form>

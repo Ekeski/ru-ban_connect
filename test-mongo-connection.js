@@ -1,33 +1,33 @@
 const { MongoClient } = require("mongodb");
 
-const uri =
-  "mongodb+srv://ekemewomaogbofavour_db_user:c1Iy8hZ4okpbYcSZ@cluster0.ddi9cfd.mongodb.net/rubanconnect?retryWrites=true&w=majority&appName=Cluster0";
+const uri = process.env.DATABASE_URL;
 
-const client = new MongoClient(uri);
+if (!uri) {
+  console.error("Missing DATABASE_URL in environment. Aborting.");
+  process.exit(1);
+}
+
+const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
 
 async function testConnection() {
   try {
     console.log("Attempting to connect to MongoDB...");
     await client.connect();
-    console.log("✓ Successfully connected to MongoDB!");
+    console.log("Connected to MongoDB");
 
     const adminDb = client.db("admin");
     await adminDb.command({ ping: 1 });
-    console.log("✓ Ping successful!");
+    console.log("Ping successful");
 
     const db = client.db("rubanconnect");
     const collections = await db.listCollections().toArray();
-    console.log(
-      "✓ Collections in database:",
-      collections.map((c) => c.name),
-    );
-
-    await client.close();
-    console.log("✓ Connection closed");
-    process.exit(0);
+    console.log("Collections:", collections.map((c) => c.name));
   } catch (error) {
-    console.error("✗ Connection error:", error.message);
-    process.exit(1);
+    console.error("Connection error:", error.message);
+    process.exitCode = 1;
+  } finally {
+    await client.close().catch(() => {});
+    console.log("Connection closed");
   }
 }
 

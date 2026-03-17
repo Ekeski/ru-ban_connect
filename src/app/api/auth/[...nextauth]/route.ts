@@ -1,53 +1,63 @@
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { compare } from "bcrypt";
-import { prisma } from "@/lib/prisma";
+import { UserService } from "@/services/database";
 
-export const authOptions = {
-  adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt",
+export const authOptions: NextAuthOptions = {
+  session: { strategy: "jwt" },
+  pages: {
+    signIn: "/login",
   },
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
-        if (!credentials) return null;
-        const { email, password } = credentials;
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return null;
-        const isValid = await compare(password, user.password);
-        if (!isValid) return null;
-        // NextAuth expects an object without password
-        const { password: _pw, ...safeUser } = user as any;
-        return safeUser;
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials.password) {
+          throw new Error("Email and password are required");
+        }
+
+        const user = await UserService.findUserByEmail(credentials.email);
+        if (!user) {
+          return null;
+        }
+
+        const isValid = await UserService.verifyPassword(
+          credentials.password,
+          user.password,
+        );
+        if (!isValid) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name ?? "",
+          role: user.role,
+        };
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = (user as any).id;
         token.role = (user as any).role;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
+      if (session.user) {
+        // @ts-expect-error Extend session user with id/role for app usage
         session.user.id = token.id as string;
-        (session.user as any).role = token.role;
+        // @ts-expect-error Extend session user with id/role for app usage
+        session.user.role = token.role as string;
       }
       return session;
     },
-  },
-  pages: {
-    signIn: "/auth/login",
-    // you can also override register etc if you create custom pages
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

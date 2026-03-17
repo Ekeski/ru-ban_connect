@@ -8,10 +8,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Leaf, ShoppingCart, User, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSession, signOut } from "next-auth/react";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
+  const { itemCount } = useCart();
 
   const navVariants = {
     hidden: { y: -100, opacity: 0 },
@@ -210,6 +212,26 @@ export default function Navbar() {
                 variants={mobileItemVariants}
                 initial="hidden"
                 animate="visible">
+                <Link href="/marketplace" onClick={() => setMobileMenuOpen(false)}>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-gray-700 hover:text-green-600 hover:bg-green-100 transition-all duration-300 font-bold text-base py-3 relative">
+                    <ShoppingCart className="h-4 w-4 mr-3" />
+                    Cart
+                    {itemCount > 0 && (
+                      <span className="absolute right-4 top-2 bg-red-500 text-white rounded-full text-xs font-bold px-2 py-[2px]">
+                        {itemCount}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
+              </motion.div>
+
+              <motion.div
+                custom={2}
+                variants={mobileItemVariants}
+                initial="hidden"
+                animate="visible">
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                   <Button
                     variant="ghost"
@@ -221,7 +243,7 @@ export default function Navbar() {
               </motion.div>
 
               <motion.div
-                custom={2}
+                custom={3}
                 variants={mobileItemVariants}
                 initial="hidden"
                 animate="visible">

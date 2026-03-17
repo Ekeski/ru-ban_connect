@@ -6,6 +6,8 @@ import { Package } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import ProductGrid from "@/components/ProductGrid";
 import { Product } from "@/types";
+import { useCart } from "@/context/CartContext";
+import { useSession } from "next-auth/react";
 
 // Mock data - will be replaced with API calls
 const mockProducts: Product[] = [
@@ -15,7 +17,7 @@ const mockProducts: Product[] = [
     description: "Premium cassava tubers grown in Nigerian farms",
     price: 1500,
     quantity: 100,
-    image: "https://picsum.photos/400/300?random=1",
+    image: "/images/cassava.avif",
     producerId: "producer1",
     createdAt: new Date(),
   },
@@ -25,7 +27,7 @@ const mockProducts: Product[] = [
     description: "Large, healthy yam tubers from Nigerian soil",
     price: 2800,
     quantity: 75,
-    image: "https://picsum.photos/400/300?random=2",
+    image: "/images/yam.avif",
     producerId: "producer2",
     createdAt: new Date(),
   },
@@ -35,7 +37,7 @@ const mockProducts: Product[] = [
     description: "Fresh bananas grown in Nigerian plantations",
     price: 1200,
     quantity: 200,
-    image: "https://picsum.photos/400/300?random=3",
+    image: "/images/banana.avif",
     producerId: "producer3",
     createdAt: new Date(),
   },
@@ -45,7 +47,7 @@ const mockProducts: Product[] = [
     description: "Premium quality rice grown in Nigerian rice fields",
     price: 3200,
     quantity: 150,
-    image: "https://picsum.photos/400/300?random=4",
+    image: "/images/rice.avif",
     producerId: "producer4",
     createdAt: new Date(),
   },
@@ -55,7 +57,7 @@ const mockProducts: Product[] = [
     description: "Fresh groundnuts harvested from Nigerian farms",
     price: 2200,
     quantity: 80,
-    image: "https://picsum.photos/400/300?random=5",
+    image: "/images/groundnuts.avif",
     producerId: "producer5",
     createdAt: new Date(),
   },
@@ -65,7 +67,7 @@ const mockProducts: Product[] = [
     description: "Pure groundnut oil extracted from Nigerian groundnuts",
     price: 4500,
     quantity: 50,
-    image: "https://picsum.photos/400/300?random=6",
+    image: "/images/groundnut-oil.avif",
     producerId: "producer6",
     createdAt: new Date(),
   },
@@ -75,7 +77,7 @@ const mockProducts: Product[] = [
     description: "Premium beans from Nigerian bean plantations",
     price: 5800,
     quantity: 40,
-    image: "https://picsum.photos/400/300?random=7",
+    image: "/images/beans.avif",
     producerId: "producer7",
     createdAt: new Date(),
   },
@@ -85,7 +87,7 @@ const mockProducts: Product[] = [
     description: "Juicy tomatoes grown in Nigerian greenhouses",
     price: 1800,
     quantity: 120,
-    image: "https://picsum.photos/400/300?random=8",
+    image: "/images/tomatoes.avif",
     producerId: "producer8",
     createdAt: new Date(),
   },
@@ -95,7 +97,7 @@ const mockProducts: Product[] = [
     description: "Sweet onions harvested from Nigerian farms",
     price: 1600,
     quantity: 90,
-    image: "https://picsum.photos/400/300?random=9",
+    image: "/images/onions.avif",
     producerId: "producer9",
     createdAt: new Date(),
   },
@@ -105,7 +107,7 @@ const mockProducts: Product[] = [
     description: "Ripe plantains grown in Nigerian plantations",
     price: 1400,
     quantity: 110,
-    image: "https://picsum.photos/400/300?random=10",
+    image: "/images/plantains.avif",
     producerId: "producer10",
     createdAt: new Date(),
   },
@@ -115,7 +117,7 @@ const mockProducts: Product[] = [
     description: "Sweet pineapples from Nigerian pineapple farms",
     price: 2500,
     quantity: 60,
-    image: "https://picsum.photos/400/300?random=11",
+    image: "/images/pineapple.avif",
     producerId: "producer11",
     createdAt: new Date(),
   },
@@ -125,7 +127,7 @@ const mockProducts: Product[] = [
     description: "Juicy mangoes harvested at peak ripeness",
     price: 3000,
     quantity: 70,
-    image: "https://picsum.photos/400/300?random=12",
+    image: "/images/mangoes.avif",
     producerId: "producer12",
     createdAt: new Date(),
   },
@@ -135,7 +137,7 @@ const mockProducts: Product[] = [
     description: "Colorful peppers grown in Nigerian soil",
     price: 2000,
     quantity: 85,
-    image: "https://picsum.photos/400/300?random=13",
+    image: "/images/pepper.avif",
     producerId: "producer13",
     createdAt: new Date(),
   },
@@ -145,7 +147,7 @@ const mockProducts: Product[] = [
     description: "Fresh irish potatoes grown in Nigerian soil",
     price: 3500,
     quantity: 45,
-    image: "https://picsum.photos/400/300?random=14",
+    image: "/images/irish-potatoes.avif",
     producerId: "producer14",
     createdAt: new Date(),
   },
@@ -155,7 +157,7 @@ const mockProducts: Product[] = [
     description: "Sweet potatoes grown in Nigerian farms",
     price: 4200,
     quantity: 35,
-    image: "https://picsum.photos/400/300?random=15",
+    image: "/images/sweet-potato.avif",
     producerId: "producer15",
     createdAt: new Date(),
   },
@@ -165,6 +167,9 @@ export default function MarketplacePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { itemCount } = useCart();
+  const { data: session } = useSession();
 
   useEffect(() => {
     // Simulate API call
@@ -194,6 +199,15 @@ export default function MarketplacePage() {
     }
   };
 
+  const handleCheckout = () => {
+    if (!session?.user) {
+      setShowAuthModal(true);
+      return;
+    }
+    // Placeholder for real checkout flow
+    alert("Proceeding to checkout...");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -221,8 +235,21 @@ export default function MarketplacePage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.3 }}>
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar onSearch={handleSearch} onCartClick={handleCheckout} />
         </motion.div>
+
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={handleCheckout}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition">
+            Proceed to checkout
+            {itemCount > 0 && (
+              <span className="rounded-full bg-white text-green-700 font-bold px-2 py-[1px] text-xs">
+                {itemCount}
+              </span>
+            )}
+          </button>
+        </div>
 
         {loading ? (
           <div className="flex justify-center items-center py-24">
@@ -253,6 +280,34 @@ export default function MarketplacePage() {
           </motion.div>
         )}
       </div>
+
+      {showAuthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 space-y-4">
+            <h3 className="text-2xl font-bold text-gray-900">Login required</h3>
+            <p className="text-gray-700">
+              Please login or sign up to complete your purchase.
+            </p>
+            <div className="flex gap-3">
+              <a
+                href="/login"
+                className="flex-1 text-center bg-green-600 text-white font-semibold py-3 rounded-lg hover:bg-green-700 transition">
+                Login
+              </a>
+              <a
+                href="/signup"
+                className="flex-1 text-center border-2 border-green-600 text-green-700 font-semibold py-3 rounded-lg hover:bg-green-50 transition">
+                Sign up
+              </a>
+            </div>
+            <button
+              onClick={() => setShowAuthModal(false)}
+              className="w-full text-center text-sm text-gray-500 hover:text-gray-700">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

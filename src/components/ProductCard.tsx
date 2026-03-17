@@ -3,18 +3,20 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Star, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Product } from "@/types";
+import { useCart } from "@/context/CartContext";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { addItem } = useCart();
+
   return (
     <motion.div
       whileHover={{ y: -10, boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)" }}
@@ -64,17 +66,17 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </CardContent>
         <CardFooter className="p-4 pt-0">
-          <Link href={`/marketplace/${product.id}`} className="w-full">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full">
-              <Button className="w-full bg-green-600 hover:bg-green-700 font-bold shadow-md hover:shadow-lg transition-all duration-300">
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                View Details
-              </Button>
-            </motion.div>
-          </Link>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full">
+            <Button
+              onClick={() => addItem(product)}
+              className="w-full bg-green-600 hover:bg-green-700 font-bold shadow-md hover:shadow-lg transition-all duration-300">
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              Add to cart
+            </Button>
+          </motion.div>
         </CardFooter>
       </Card>
     </motion.div>
